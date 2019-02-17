@@ -23,6 +23,35 @@ import Store from "electron-store";
 import Vue from "vue";
 const store = new Store();
 
+const scaffold = {
+  total: {
+    startedWith: 0,
+    saved: 0,
+    spent: 0,
+    earned: 0
+  },
+  spent: {
+    inRent: [],
+    inGuitar: [],
+    inTransportation: [],
+    inWeed: [],
+    inGroceries: [],
+    inEntertainment: [],
+    inRestaurantsAndBars: [],
+    inClothing: [],
+    inItunes: [],
+    inGifts: [],
+    inPharmacy: [],
+    inAlcohol: [],
+    inAmazon: [],
+    inOther: []
+  },
+  saved: {
+    inTfsa: [],
+    inMutualFunds: []
+  }
+};
+
 const Form = {
   name: "Form",
   methods: {
@@ -30,7 +59,7 @@ const Form = {
       e.preventDefault();
 
       if (_.isEmpty(this.database)) {
-        store.set(`budget.${this.budgetTitle}`, {});
+        store.set(`budget.${this.budgetTitle}`, { ...scaffold });
       } else {
         store.delete(`budget.${Object.keys(this.database)[0]}`);
       }
