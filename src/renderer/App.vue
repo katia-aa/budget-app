@@ -3,16 +3,18 @@
     <form v-on:submit="submitBudgetTitle">
       <label for="budgetTitle">Enter title (month and year)</label>
       <input name="budgetTitle" v-model="budgetTitle">
-      <button name="create" v-if="Object.keys(database).length === 0" type="submit">Create</button>
-      <button name="clear" v-else type="submit">Clear</button>
+      <button name="create" type="submit">Create</button>
     </form>
-
-    <form v-on:submit="renameBudgetTitle">
+    <button v-on:click="clearBudget">Clear</button>
+    <form>
       <label for="renamedTitle">Rename budget title</label>
       <input name="renamedTitle" v-model="renamedTitle">
-      <button name="clear" type="submit">rename</button>
     </form>
-
+    <div v-for="item in Object.keys(this.database)" :key="item">
+      {{ item }}
+      <button :id="item" v-on:click="renameBudgetTitle">rename</button>
+      <button :id="item" v-on:click="deleteEntry">delete</button>
+    </div>
     <pre>{{database}}</pre>
   </div>
 </template>
@@ -58,37 +60,46 @@ const Form = {
     submitBudgetTitle: function(e) {
       e.preventDefault();
 
-      if (_.isEmpty(this.database)) {
-        store.set(`budget.${this.budgetTitle}`, { ...scaffold });
-      } else {
-        store.delete(`budget.${Object.keys(this.database)[0]}`);
-      }
+      this.database = {
+        ...this.database,
+        [this.budgetTitle]: {
+          ...scaffold
+        }
+      };
 
-      // Update local app state and clear field.
-      this.database = store.get(`budget`);
+      store.set(`budget`, this.database);
       this.budgetTitle = "";
     },
+    clearBudget: function() {
+      this.database = {};
+      store.delete(`budget`);
+    },
     renameBudgetTitle: function(e) {
-      e.preventDefault();
+      const changedDatabase = Object.keys(this.database).reduce((acc, val) => {
+        if (val === e.target.id) {
+          acc[this.renamedTitle] = this.database[e.target.id];
+        } else {
+          acc[val] = this.database[val];
+        }
+        return acc;
+      }, {});
 
-      const budgetContent = `budget.${Object.keys(this.database)[0]}`;
-      const budgetTitle = Object.keys(this.database)[0];
-
-      store.set("temp", store.get(budgetContent));
-      store.delete(`budget.${budgetTitle}`);
-      store.set(`budget.${this.renamedTitle}`, store.get("temp"));
-
-      // Update local app state, delete temporary data and clear field.
-      this.database = store.get(`budget`);
-      store.delete("temp");
+      this.database = changedDatabase;
+      store.set(`budget`, this.database);
       this.renamedTitle = "";
+    },
+    deleteEntry: function(e) {
+      const updatedDatabase = { ...this.database };
+      delete updatedDatabase[e.target.id];
+      this.database = updatedDatabase;
+      store.set(`budget`, this.database);
     }
   },
   data() {
     return {
       budgetTitle: "",
       renamedTitle: "",
-      database: store.get("budget")
+      database: store.get("budget") || {}
     };
   }
 };
