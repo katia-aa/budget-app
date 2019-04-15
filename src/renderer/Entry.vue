@@ -16,10 +16,7 @@
 
 <script>
 import Vue from "vue";
-import Store from "electron-store";
 import _ from 'lodash'
-
-const store = new Store();
 
 const Entry = {
   name: "Entry",

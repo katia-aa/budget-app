@@ -33,11 +33,8 @@
 
 <script>
 import _ from "lodash";
-import Store from "electron-store";
 import Vue from "vue";
 import Entry from './Entry'
-
-const store = new Store();
 
 const scaffold = {
   total: {
@@ -143,7 +140,7 @@ const Form = {
     return {
       title: "",
       newTitle: "",
-      collection: store.get("budget") || {},
+      collection: {},
       isEntryView: false,
       selectedEntryTitle: undefined,
     };
