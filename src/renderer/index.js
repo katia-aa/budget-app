@@ -5,19 +5,12 @@
 import Vue from 'vue'
 import App from './App.vue'
 
+Vue.component('App', App);
 
 new Vue({
-  render(h) {
-    return h(App)
-  },
-  renderError(h, err) {
-    return h('pre', {
-      style: {
-        color: 'red'
-      }
-    }, err.stack)
-  }
-}).$mount('#app')
+  el: '#app',
+  template: `<App />`
+})
 
 
 
