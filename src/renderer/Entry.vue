@@ -1,17 +1,24 @@
 <template>
-  <section>
-    <div>{{ title }}</div>
+  <article>
+    <h1>{{ title }}</h1>
     <button @click="viewEntries">View entries list</button>
 
     
-    <label for="entry.total.startedWith.value">Change started with total</label>
+    <!-- <label for="entry.total.startedWith.value">Change started with total</label>
     <input :disabled="this.entry.total.startedWith.locked" name="entry.total.startedWith.value" v-model="entry.total.startedWith.value">
     <button name="0.0" @click="saveBudget">Change</button>
-    <button name="0.0" @click="unlock">Edit</button>
+    <button name="0.0" @click="unlock">Edit</button> -->
+
+    <section v-for="(accessLvlfirst) in Object.keys(entry)" :key="accessLvlfirst">
+      <h3>{{accessLvlfirst}}</h3>
+      <div v-for="title in Object.keys(entry[accessLvlfirst])" :key="title">
+        {{title}}
+      </div>
+    </section>
     
 
     <pre>{{ entry }}</pre>
-  </section>
+  </article>
 </template>
 
 <script>
@@ -80,8 +87,6 @@ const Entry = {
       localStorage.setItem("budget", JSON.stringify(collection));
     },
     unlock: function (e) {
-      console.log('e.target')
-      console.log(e.target)
       this.setLock(e.target.name, false)
     },
     viewEntries: function() {
