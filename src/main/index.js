@@ -1,5 +1,9 @@
 // Modules to control application life and create native browser window
-const {app, BrowserWindow} = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
+const fs = require('fs');
+const readline = require('readline')
+const path = require('path')
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -7,11 +11,10 @@ let mainWindow
 
 const createWindow = () => {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 1400, height: 940})
+  mainWindow = new BrowserWindow({ width: 1400, height: 940 })
 
   // webpack dev server location
   mainWindow.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
-  
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
     // Dereference the window object, usually you would store windows
@@ -37,6 +40,56 @@ const recreateWindow = () => {
   }
 }
 
+const extractCsvLines = (filePath) => {
+  return new Promise(resolve => {
+    let lineCounter = 0;
+    let wantedLines = [];
+    const readStream = fs.createReadStream(filePath)
+    const lineReader = readline.createInterface({
+      input: readStream
+    });
+
+    // On each line, increment counter and add the line to an array.
+    lineReader.on('line', function (line) {
+      lineCounter++;
+      wantedLines.push(line.split(','));
+      // If two lines were read, emit the close readline event.
+      if (lineCounter == 2) {
+        lineReader.close();
+      }
+    });
+
+    // Upon receiving the close line event, send the 
+    // wantedLines to the renderer and close the lineReader.
+    lineReader.on('close', function () {
+      resolve(wantedLines)
+      lineReader.close()
+      readStream.destroy()
+    })
+  });
+}
+async function sendCsvExtractedData(event, filePath) {
+  const headers = await extractCsvLines(filePath);
+  event.sender.send('extract-csv-data-reply', { data: headers })
+}
+
+ipcMain.on('extract-csv-data', (event, filePaths) => {
+  filePaths.forEach(function (filePath) {
+    const isCSV = path.extname(filePath).toLowerCase() === '.csv'
+    if (isCSV) {
+      try {
+        sendCsvExtractedData(event, filePath)
+      } catch (error) {
+        console.log('error@!!!!') // test that this works
+      }
+    } else {
+      event.sender.send('extract-csv-data-reply', { 
+        error: true,
+        data: 'Not a .csv file' 
+      })
+    }
+  })
+})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

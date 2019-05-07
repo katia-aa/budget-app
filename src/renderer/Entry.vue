@@ -1,102 +1,63 @@
 <template>
   <article>
     <h1>{{ title }}</h1>
-    <button @click="viewEntries">View entries list</button>
-
-    
-    <!-- <label for="entry.total.startedWith.value">Change started with total</label>
-    <input :disabled="this.entry.total.startedWith.locked" name="entry.total.startedWith.value" v-model="entry.total.startedWith.value">
-    <button name="0.0" @click="saveBudget">Change</button>
-    <button name="0.0" @click="unlock">Edit</button> -->
-
-    <section v-for="(accessLvlfirst) in Object.keys(entry)" :key="accessLvlfirst">
-      <h3>{{accessLvlfirst}}</h3>
-      <div v-for="title in Object.keys(entry[accessLvlfirst])" :key="title">
-        {{title}}
-      </div>
-    </section>
-    
-
-    <pre>{{ entry }}</pre>
+    <table>
+      <tr>
+        <th />
+        <th v-for="(item, index) in data[0]" :key="index">{{item}}</th>
+      </tr>
+      <tr v-for="(items, index) in data.slice(1)" :key="index">
+        <td>
+          <input type="checkbox" />
+        </td>
+        <td v-for="(item, index) in items" :key="index">{{ item.length ? item: 'N/A' }}</td>
+      </tr>
+    </table>
   </article>
 </template>
 
 <script>
 import Vue from "vue";
-import _ from 'lodash'
+import _ from "lodash";
+import { remote } from "electron";
+import { ipcRenderer } from "electron";
 
 const Entry = {
   name: "Entry",
   props: ["title"],
   data() {
     return {
-      entry: {
-        total: {
-          startedWith: {
-            value: 0,
-            locked: false
-          },
-          saved: 0,
-          spent: 0,
-          earned: 0
-        },
-        spent: {
-          inRent: [],
-          inGuitar: [],
-          inTransportation: [],
-          inWeed: [],
-          inGroceries: [],
-          inEntertainment: [],
-          inRestaurantsAndBars: [],
-          inClothing: [],
-          inItunes: [],
-          inGifts: [],
-          inPharmacy: [],
-          inAlcohol: [],
-          inAmazon: [],
-          inOther: []
-        },
-        saved: {
-          inTfsa: [],
-          inMutualFunds: []
-        },
-        earned: {
-          inTfsa: [],
-          inMutualFunds: []
-        }
-      }
+      data: [],
     };
   },
   methods: {
-    setLock: function(targetName, lock) {
-      const keyAccessor = targetName.split('.').map((el) => parseInt(el, 10))
-      const accessLvlfirst = Object.keys(this.entry)[keyAccessor[0]]
-      const accessLvlSecond = Object.keys(this.entry[accessLvlfirst])[keyAccessor[1]]
-      this.entry[accessLvlfirst][accessLvlSecond].locked = lock
-    },
-    saveBudget: function(e) {
-      e.preventDefault();
-      const budget = localStorage.getItem("budget");
-      const parsedBudget = JSON.parse(budget);
-      this.setLock(e.target.name, true)
-      const collection = {
-        ...parsedBudget,
-        [this.title]: this.entry
-      };
-      
-      localStorage.setItem("budget", JSON.stringify(collection));
-    },
-    unlock: function (e) {
-      this.setLock(e.target.name, false)
-    },
-    viewEntries: function() {
-      this.$emit("toggleView");
+    openFileSelectionDialog: function () {
+      remote.dialog.showOpenDialog(
+        { properties: ["openFile", "openDirectory", "multiSelections"] },
+        filePaths => {
+          if (filePaths === undefined) {
+            console.log("You didn't select a folder");
+            return;
+          }
+          ipcRenderer.send("extract-csv-data", filePaths);
+        }
+      );
     }
   },
-  mounted() {
-    const budget = localStorage.getItem("budget");
-    const parsedBudget = JSON.parse(budget);
-    this.entry = parsedBudget[this.title];
+  created() {
+    this.openFileSelectionDialog()
+
+    ipcRenderer.on("extract-csv-data-reply", (event, arg) => {
+      if (arg.error !== undefined && arg.error) {
+        alert(arg.data)
+        this.openFileSelectionDialog()
+      } else {
+        const { data } = arg
+        if (data.length > 0) {
+          this.data = data;
+        }
+      }
+    });
   }
 };
 
