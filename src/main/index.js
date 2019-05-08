@@ -42,21 +42,36 @@ const recreateWindow = () => {
 
 const extractCsvLines = (filePath) => {
   return new Promise(resolve => {
-    let lineCounter = 0;
-    let wantedLines = [];
+    let wantedLines = {};
+    let counter = 0;
     const readStream = fs.createReadStream(filePath)
     const lineReader = readline.createInterface({
       input: readStream
     });
 
+    
     // On each line, increment counter and add the line to an array.
-    lineReader.on('line', function (line) {
-      lineCounter++;
-      wantedLines.push(line.split(','));
-      // If two lines were read, emit the close readline event.
-      if (lineCounter == 2) {
-        lineReader.close();
+    lineReader.on('line',  function (line) {
+      if (counter === 0) {
+        wantedLines.headers = ['type', ...line.split(',')];
+      } else {
+        let row = {}
+        row.type = null
+        wantedLines.headers.forEach((header, index) => {
+          if (header !== 'type') {
+            row[header] = line.split(',')[index - 1]
+          }
+        })
+        if (wantedLines.rows !== undefined) {
+          wantedLines.rows = [
+            ...wantedLines.rows,
+            row
+          ]
+        } else {
+          wantedLines.rows = [row]
+        }
       }
+      counter++;
     });
 
     // Upon receiving the close line event, send the 
@@ -80,12 +95,12 @@ ipcMain.on('extract-csv-data', (event, filePaths) => {
       try {
         sendCsvExtractedData(event, filePath)
       } catch (error) {
-        console.log('error@!!!!') // test that this works
+        console.log('An error has occurred  when attempting to send the extracted csv data.') // test that this works
       }
     } else {
-      event.sender.send('extract-csv-data-reply', { 
+      event.sender.send('extract-csv-data-reply', {
         error: true,
-        data: 'Not a .csv file' 
+        data: 'Not a .csv file'
       })
     }
   })
