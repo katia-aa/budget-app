@@ -1,25 +1,17 @@
 <template>
   <article>
     <h1>{{ title }}</h1>
-    <!-- <table>
+    <table>
       <tr>
-        <th />
         <th v-for="(item, index) in data.headers" :key="index">{{item}}</th>
       </tr>
       <tr v-for="(items, index) in data.rows" :key="index">
-        <td>
-          <label for="needs">need</label>
-          <input type="radio" name="needs"/>
-
-          <label for="wishes">wish</label>
-          <input type="radio" name="wishes"/>
-          
-          <label for="savings">saving</label>
-          <input type="radio" name="savings"/>
-        </td>
-        <td v-for="(item, index) in items" :key="index">{{ item.length ? item: 'N/A' }}</td>
+        <td
+          v-for="(item, index) in data.headers"
+          :key="index"
+        >{{ items[item] === null ? 'yooo': items[item].length ? items[item]: 'N/A'}}</td>
       </tr>
-    </table> -->
+    </table>
   </article>
 </template>
 
@@ -34,11 +26,11 @@ const Entry = {
   props: ["title"],
   data() {
     return {
-      data: [],
+      data: []
     };
   },
   methods: {
-    openFileSelectionDialog: function () {
+    openFileSelectionDialog: function() {
       remote.dialog.showOpenDialog(
         { properties: ["openFile", "openDirectory", "multiSelections"] },
         filePaths => {
@@ -52,17 +44,14 @@ const Entry = {
     }
   },
   created() {
-    this.openFileSelectionDialog()
+    this.openFileSelectionDialog();
 
     ipcRenderer.on("extract-csv-data-reply", (event, arg) => {
       if (arg.error !== undefined && arg.error) {
-        alert(arg.data)
-        this.openFileSelectionDialog()
+        alert(arg.data);
+        this.openFileSelectionDialog();
       } else {
-        const { data } = arg
-        if (data.length > 0) {
-          this.data = data;
-        }
+        this.data = arg.data;
       }
     });
   }
