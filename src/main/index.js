@@ -53,14 +53,11 @@ const extractCsvLines = (filePath) => {
     // On each line, increment counter and add the line to an array.
     lineReader.on('line',  function (line) {
       if (counter === 0) {
-        wantedLines.headers = ['type', ...line.split(',')];
+        wantedLines.headers = line.split(',');
       } else {
         let row = {}
-        row.type = null
-        wantedLines.headers.forEach((header, index) => {
-          if (header !== 'type') {
-            row[header] = line.split(',')[index - 1]
-          }
+        wantedLines.headers.forEach((header, idx) => {
+          row[header] = line.split(',')[idx]
         })
         if (wantedLines.rows !== undefined) {
           wantedLines.rows = [
@@ -77,6 +74,19 @@ const extractCsvLines = (filePath) => {
     // Upon receiving the close line event, send the 
     // wantedLines to the renderer and close the lineReader.
     lineReader.on('close', function () {
+      // Here we add custom columns to our csv data.
+      wantedLines.headers = [
+        'need', 
+        'want', 
+        'saving', 
+        ...wantedLines.headers
+      ]
+      wantedLines.rows.forEach((row) => {
+        row.need = null
+        row.want = null
+        row.saving = null
+      })
+
       resolve(wantedLines)
       lineReader.close()
       readStream.destroy()

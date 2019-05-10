@@ -3,13 +3,34 @@
     <h1>{{ title }}</h1>
     <table>
       <tr>
-        <th v-for="(item, index) in data.headers" :key="index">{{item}}</th>
+        <th v-for="(header, index) in data.headers" :key="index">{{header}}</th>
       </tr>
-      <tr v-for="(items, index) in data.rows" :key="index">
+      <tr v-for="(row, rowIndex) in data.rows" :key="rowIndex">
         <td
-          v-for="(item, index) in data.headers"
-          :key="index"
-        >{{ items[item] === null ? 'yooo': items[item].length ? items[item]: 'N/A'}}</td>
+          v-for="(header, headerIndex) in data.headers"
+          :key="headerIndex"
+        >
+          <button 
+            v-if="header === 'need'"
+            @click="onClick('need', rowIndex)"
+          >
+            need
+          </button>
+          <button 
+            v-else-if="header === 'want'"
+            @click="onClick('want', rowIndex)"
+          >
+            want
+          </button>
+          <button 
+            v-else-if="header === 'saving'"
+            @click="onClick('saving', rowIndex)"
+          >
+            saving
+          </button>
+          <div v-else-if="row[header]">{{row[header]}}</div>
+          <div v-else>N/A</div>
+        </td>
       </tr>
     </table>
   </article>
@@ -26,10 +47,14 @@ const Entry = {
   props: ["title"],
   data() {
     return {
-      data: []
+      data: [],
     };
   },
   methods: {
+    onClick: function (type, rowIndex) {
+      console.log(type)
+      console.log(rowIndex)
+    },
     openFileSelectionDialog: function() {
       remote.dialog.showOpenDialog(
         { properties: ["openFile", "openDirectory", "multiSelections"] },
