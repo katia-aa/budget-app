@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div class="block">
     <div id="form-container" v-if="!this.isEntryView">
-      <button v-on:click="toggleView">New</button>
+      <button @click="toggleView">New</button>
     </div>
-    <Entry v-else v-bind:title="selectedEntryTitle" @toggleView="toggleView"/>
+    <entry v-else></entry>
   </div>
 </template>
 
@@ -12,25 +12,19 @@ import _ from "lodash";
 import Vue from "vue";
 import Entry from "./Entry";
 
-const Form = {
-  name: "Form",
+export default {
+  name: "app",
+  data: function() {
+    return {
+      isEntryView: false
+    };
+  },
   methods: {
-    toggleView: function(e) {
+    toggleView: function() {
       this.isEntryView = !this.isEntryView;
     }
-  },
-  data() {
-    return {
-      title: "",
-      newTitle: "",
-      collection: {},
-      isEntryView: false,
-      selectedEntryTitle: undefined
-    };
   }
 };
-
-export default Form;
 </script>
 
 <style>
@@ -40,6 +34,9 @@ export default Form;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+.block {
+  height: 100vh;
+  background-color: #046d8b;
 }
 </style>

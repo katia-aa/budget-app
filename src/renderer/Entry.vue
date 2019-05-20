@@ -1,6 +1,5 @@
 <template>
   <article>
-    <h1>{{ title }}</h1>
     <table>
       <tr>
         <th v-for="(header, index) in data.headers" :key="index">{{header}}</th>
@@ -42,13 +41,12 @@ import _ from "lodash";
 import { remote } from "electron";
 import { ipcRenderer } from "electron";
 
-const Entry = {
-  name: "Entry",
-  props: ["title"],
-  data() {
+export default Vue.component('entry', {
+  name: 'entry',
+  data: function () {
     return {
       data: [],
-    };
+    }
   },
   methods: {
     onClick: function (type, rowIndex) {
@@ -58,7 +56,8 @@ const Entry = {
       // I was going to use the map function but I'm going to 
       // do some slicing instead. 
     },
-    openFileSelectionDialog: function() {
+  },
+  created() {
       remote.dialog.showOpenDialog(
         { properties: ["openFile", "openDirectory", "multiSelections"] },
         filePaths => {
@@ -68,11 +67,7 @@ const Entry = {
           }
           ipcRenderer.send("extract-csv-data", filePaths);
         }
-      );
-    }
-  },
-  created() {
-    this.openFileSelectionDialog();
+      )
 
     ipcRenderer.on("extract-csv-data-reply", (event, arg) => {
       if (arg.error !== undefined && arg.error) {
@@ -83,7 +78,7 @@ const Entry = {
       }
     });
   }
-};
+})
 
-export default Vue.component("Entry", Entry);
+
 </script>

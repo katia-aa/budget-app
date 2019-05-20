@@ -5,9 +5,11 @@
 import Vue from 'vue'
 import App from './App.vue'
 
-Vue.component('App', App);
-
-new Vue({
+const instance = {
   el: '#app',
-  template: `<App />`
-})
+  render: (h) => {
+    return h(App)
+  }
+}
+
+new Vue(instance)
