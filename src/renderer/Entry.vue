@@ -1,5 +1,13 @@
 <template>
   <article>
+    <section>
+      <h3>Which column has the amount?</h3>
+      <ul>
+        <li v-for="(header, index) in data.headers" :key="index">
+          <button>{{ header }}</button>
+        </li>
+      </ul>
+    </section>
     <table>
       <tr>
         <th v-for="(header, index) in data.headers" :key="index">{{header}}</th>
