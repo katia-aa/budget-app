@@ -8,6 +8,9 @@
         </li>
       </ul>
     </section>
+    <button
+      @click="onCalculate()"
+    >Calculate</button>
     <table>
       <tr>
         <th v-for="(header, index) in data.headers" :key="index">{{header}}</th>
@@ -58,6 +61,27 @@ export default Vue.component("entry", {
     };
   },
   methods: {
+    onCalculate: function () {
+      let need = 0
+      let want = 0
+      let saving = 0
+      this.data.rows.forEach((row)=> {
+        switch(true) {
+          case row.need:
+            need += parseFloat(row["Amount"])
+            break
+          case row.want:
+            want += parseFloat(row["Amount"])
+            break
+          case row.saving:
+            saving += parseFloat(row["Amount"])
+            break
+          default:
+            null
+        }
+      })
+     console.log(need)
+    },
     onClick: function(action, rowIndex) {
       this.data.rows[rowIndex]["need"] = false;
       this.data.rows[rowIndex]["want"] = false;
