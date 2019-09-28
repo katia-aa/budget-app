@@ -4,16 +4,18 @@
   "description": "A minimal Electron application",
   "main": "main.js",
   "scripts": {
-    "start": "electron-webpack dev"
+    "start": "electron-webpack dev",
+    "format": "./node_modules/.bin/prettier --write \"**/*.{md,js,json,jsx,ts,tsx,yml}\""
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "^4.0.1",
-    "electron-webpack-vue": "^2.2.3",
-    "vue": "^2.5.22",
     "electron-webpack": "^2.6.1",
+    "electron-webpack-vue": "^2.2.3",
+    "prettier": "1.18.2",
+    "vue": "^2.5.22",
     "webpack": "^4.29.0"
   },
   "dependencies": {

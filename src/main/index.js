@@ -17,25 +17,26 @@ app.on('ready', () => createWindow(BrowserWindow, mainWindow))
 app.on('window-all-closed', closeWindow)
 app.on('activate', () => recreateWindow(createWindow, mainWindow))
 
-
 async function sendCsvExtracted(event, filePath) {
-  const headers = await extractCsvLines(filePath);
+  const headers = await extractCsvLines(filePath)
   event.sender.send('extract-csv-data-reply', { data: headers })
 }
 
 ipcMain.on('extract-csv-data', (event, filePaths) => {
-  filePaths.forEach(function (filePath) {
+  filePaths.forEach(function(filePath) {
     const isCSV = path.extname(filePath).toLowerCase() === '.csv'
     if (isCSV) {
       try {
         sendCsvExtracted(event, filePath)
       } catch (error) {
-        console.log('An error has occurred  when attempting to send the extracted csv data.') // test that this works
+        console.log(
+          'An error has occurred  when attempting to send the extracted csv data.'
+        ) // TODO: Test that this works.
       }
     } else {
       event.sender.send('extract-csv-data-reply', {
         error: true,
-        data: 'Not a .csv file'
+        data: 'Not a .csv file',
       })
     }
   })

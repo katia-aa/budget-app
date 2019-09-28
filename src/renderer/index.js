@@ -7,9 +7,9 @@ import App from './App.vue'
 
 const instance = {
   el: '#app',
-  render: (h) => {
+  render: h => {
     return h(App)
-  }
+  },
 }
 
 new Vue(instance)

@@ -3,14 +3,14 @@ export const createWindow = (BrowserWindow, mainWindow) => {
   mainWindow = new BrowserWindow({ ...dimensions, show: false })
 
   const showWindow = () => mainWindow.show()
-  const discardWindow = () => mainWindow = null
-
+  const discardWindow = () => (mainWindow = null)
 
   mainWindow.once('ready-to-show', showWindow)
 
   // webpack dev server location
-  mainWindow.loadURL(`http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`)
-
+  mainWindow.loadURL(
+    `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`
+  )
 
   mainWindow.on('closed', discardWindow)
 }
