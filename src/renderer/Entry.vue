@@ -43,7 +43,7 @@ export default Vue.component('entry', {
     remote.dialog.showOpenDialog(
       { properties: ['openFile', 'openDirectory', 'multiSelections'] },
       filePaths => {
-        if (filePaths === undefined) {
+        if (!filePaths) {
           alert("You didn't select a folder")
           return
         }
@@ -52,7 +52,7 @@ export default Vue.component('entry', {
     )
 
     ipcRenderer.on('extract-csv-data-reply', (event, arg) => {
-      if (arg.error !== undefined && arg.error) {
+      if (arg.error) {
         alert(arg.data)
         this.openFileSelectionDialog()
       } else {
