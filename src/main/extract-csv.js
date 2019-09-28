@@ -34,9 +34,9 @@ export const extractCsvLines = filePath => {
       // Here we add custom columns to our csv data.
       wantedLines.headers = ['need', 'want', 'saving', ...wantedLines.headers]
       wantedLines.rows.forEach(row => {
-        row.need = null
-        row.want = null
-        row.saving = null
+        row.need = false
+        row.want = false
+        row.saving = false
       })
 
       resolve(wantedLines)
