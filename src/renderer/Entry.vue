@@ -34,7 +34,7 @@ export default Vue.component('entry', {
     onClick: function(type, rowIndex) {
       console.log(type)
       console.log(rowIndex)
-      // To-do: modify data to mark the selected row as a type.
+      // TODO: modify data to mark the selected row as a type.
       // I was going to use the map function but I'm going to
       // do some slicing instead.
     },
