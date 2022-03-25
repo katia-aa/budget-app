@@ -11,7 +11,7 @@
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {
-    "electron": "^4.0.1",
+    "electron": "^13.6.6",
     "electron-webpack": "^2.6.1",
     "electron-webpack-vue": "^2.2.3",
     "prettier": "1.18.2",
